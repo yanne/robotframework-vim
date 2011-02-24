@@ -1,0 +1,90 @@
+Robot Framework test data consists of four tables.
+In .txt format, content before the first table is ignored totally.
+Table definitions are of the form * tablename *, where you can have
+any number of * characters.
+
+There are two different separators in .txt format '|' and '  ',
+that is, two or more spaces. This file uses the latter.
+
+# is a comment mark in all tables. Starting from # until end of line
+# is considered comment.
+
+All setting names are case and space insensitive, i.e. 
+`documentation`, `Documentation` and `D  ocU Men TaT ION` are considered same.
+
+*** Settings ***
+# In the setting table, all definitions are of the form
+# Setting Name  Value  possibly  other  values
+
+Documentation  This is the test suite documentation, visible in report and log files
+...  An ellipsis is a line continuation mark, so this line is appended to the previous
+
+
+# Metadata is additional information, defined as key-value pairs, can be used multiple times
+Metadata  Name  Value
+Metadata  Another  Something
+
+# Setups and Teardowns take a single keyword and it's arguments
+Suite Setup  Log  in suite setup
+Suite Teardown  Log  in suite teardwon
+Test Setup  Log  in test setup
+Test Teardown  Log  in test teardown
+
+# Tags are textual labels applied to tests. Robot Framework collects
+# statistics based on tags and test execution can be configured to 
+# e.g. include or exclude tests based on their tags.
+Force Tags  force-1  force-2
+Default Tags  def-1
+
+Test Timeout  10seconds  timeout error message
+#Test Template  Some keyword  # See details from the user guide.
+
+# Import settings are used to take additional resources into use.
+# There are three types of imports: Resource, Library and Variables.
+# all can be used multiple times
+Library  OperatingSystem
+Resource  my_resource.txt
+Variables  my_vars.py
+
+*** Variables ***
+# There are two types of variables: scalar ${} and list @{}
+# Variables defined in the variable table are local to this file.
+# Variable names are case insensitive too.
+${SCALAR}  value
+@{LIST}  1  2  3  4
+
+*** Test cases ***
+# Text in the first column starts a new test case. 
+# Test case consists of a number of steps.
+# Test case has it's own settings which are of the form 
+# [Setting name]  value  ...
+
+First Test
+    Log  inside the first test
+
+Second Test
+    Log  inside second test
+    Log  this test has two steps
+
+Third Test
+    [Documentation]  This is test case doc
+    [Tags]  3rd-tag  #Overrides Default Tags from setting table
+    [Setup]  Log  in overridden test setup  #Overrides Test Setup from the setting table
+    [Teardown]  Log  in overridden test teardown  #Overrides Test Teardown from the setting table
+    [Timeout]  1s  #Overrides Test Timeout 
+    First Keyword
+
+*** Keywords ***
+# Keyword table has same syntax as the test case table
+# Keywords have different settings than test cases though.
+First Keyword
+    Log  inside First Keyword
+    ${ret}=  Second Keyword  a1  a2
+    Log  ${ret}
+
+Second Keyword
+    [Documentation]  This is keyword doc
+    [Arguments]  ${arg1}  ${arg2}
+    [Timeout]  100 min
+    Log  inside Second Keyword ${arg1} ${arg2}
+    [Return]  2
